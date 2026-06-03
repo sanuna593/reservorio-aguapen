@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Reservorio AGUAPEN">
+<title>Reservorio Central · AGUAPEN EP</title>
+<style>
+:root {
+  --primary:#1a1a2e; --accent:#0f6e56; --accent-l:#1d9e75; --accent-bg:#e1f5ee;
+  --danger:#c0392b; --danger-bg:#fdecea; --warn:#854f0b; --warn-bg:#faeeda;
+  --info:#185fa5; --info-bg:#e6f1fb;
+  --surface:#fff; --s2:#f8f9fa; --s3:#f1f3f4;
+  --border:rgba(0,0,0,0.10); --border2:rgba(0,0,0,0.16);
+  --text:#1a1a2e; --t2:#5f6368; --t3:#9aa0a6;
+  --r:10px; --rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'SF Pro Text',BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--s2);color:var(--text);min-height:100vh;padding-bottom:calc(env(safe-area-inset-bottom,20px) + 20px)}
+.app-header{background:var(--primary);color:#fff;padding:16px 16px 12px;padding-top:calc(16px + env(safe-area-inset-top,0px))}
+.app-header h1{font-size:17px;font-weight:600;letter-spacing:-.3px}
+.app-header p{font-size:12px;opacity:.65;margin-top:2px}
+.presup-pill{display:inline-block;background:rgba(255,255,255,.12);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;margin-top:6px}
+.tabs{display:flex;background:var(--surface);border-bottom:.5px solid var(--border2);position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{flex:0 0 auto;min-width:72px;padding:10px 8px 8px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border:none;background:none;color:var(--t2);border-bottom:2.5px solid transparent;transition:all .15s;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-icon{display:block;font-size:17px;margin-bottom:2px}
+.pane{display:none;padding:14px 14px 60px}
+.pane.active{display:block}
+.sec-title{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:16px}
+.sec-title:first-child{margin-top:0}
+.card{background:var(--surface);border-radius:var(--rl);border:.5px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px}
+.field select,.field input,.field textarea{width:100%;padding:10px 12px;font-size:15px;border:.5px solid var(--border2);border-radius:var(--r);background:var(--s2);color:var(--text);-webkit-appearance:none;appearance:none;font-family:inherit;outline:none;transition:border-color .15s}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;background-color:var(--s2)}
+.field select:focus,.field input:focus,.field textarea:focus{border-color:var(--accent);background:var(--surface)}
+.field textarea{resize:none;height:72px;line-height:1.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rubro-info{display:none;background:var(--accent-bg);border:.5px solid rgba(15,110,86,.25);border-radius:var(--r);padding:10px 12px;margin:-4px 0 12px}
+.rubro-info.show{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.ri-item{text-align:center}
+.ri-lbl{font-size:10px;color:var(--accent);font-weight:500;display:block}
+.ri-val{font-size:13px;font-weight:600;color:#0f6e56;display:block;margin-top:1px}
+.custom-badge{display:inline-block;background:var(--info-bg);color:var(--info);font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;vertical-align:middle}
+.btn-primary{width:100%;padding:14px;font-size:16px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--rl);cursor:pointer;letter-spacing:-.2px;transition:all .15s;margin-top:4px}
+.btn-primary:active{transform:scale(.98);background:var(--accent-l)}
+.btn-sec{padding:9px 14px;font-size:13px;font-weight:500;background:var(--s2);color:var(--t2);border:.5px solid var(--border2);border-radius:var(--r);cursor:pointer}
+.btn-danger-sm{padding:5px 10px;font-size:12px;font-weight:500;background:none;color:var(--danger);border:.5px solid rgba(192,57,43,.3);border-radius:6px;cursor:pointer}
+.btn-edit-sm{padding:5px 10px;font-size:12px;font-weight:500;background:none;color:var(--info);border:.5px solid rgba(24,95,165,.3);border-radius:6px;cursor:pointer;margin-right:6px}
+.toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);background:var(--primary);color:#fff;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:500;opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--accent)}
+.toast.err{background:var(--danger)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--surface);border-radius:var(--rl);border:.5px solid var(--border);padding:14px 12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.stat-card .s-lbl{font-size:11px;color:var(--t2);font-weight:500;margin-bottom:4px}
+.stat-card .s-val{font-size:22px;font-weight:700;color:var(--primary);letter-spacing:-.5px;line-height:1}
+.stat-card .s-sub{font-size:11px;color:var(--t3);margin-top:4px}
+.global-bar{background:var(--surface);border-radius:var(--rl);border:.5px solid var(--border);padding:14px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.gb-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.gb-lbl{font-size:12px;color:var(--t2);font-weight:500}
+.gb-pct{font-size:13px;font-weight:700;color:var(--accent)}
+.bar-track{height:8px;background:var(--s3);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent-l));transition:width .5s ease}
+.bar-fill.over{background:linear-gradient(90deg,var(--danger),#e74c3c)}
+.bar-fill.custom{background:linear-gradient(90deg,var(--info),#378add)}
+.rubros-section h3{font-size:12px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.prog-item{background:var(--surface);border-radius:var(--r);border:.5px solid var(--border);padding:12px;margin-bottom:8px}
+.pi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+.pi-name{font-size:13px;font-weight:500;color:var(--text);flex:1;line-height:1.3}
+.pi-pct{font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap}
+.pi-pct.over{color:var(--danger)}
+.pi-pct.custom{color:var(--info)}
+.pi-amounts{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:6px}
+.pi-bar{height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.pi-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .4s}
+.pi-fill.over{background:var(--danger)}
+.pi-fill.custom{background:var(--info)}
+.filter-bar{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.filter-bar select{flex:1;padding:9px 12px;font-size:13px;border:.5px solid var(--border2);border-radius:var(--r);background:var(--surface);color:var(--text);-webkit-appearance:none}
+.entry-card{background:var(--surface);border-radius:var(--rl);border:.5px solid var(--border);padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.entry-card.custom-entry{border-left:3px solid var(--info)}
+.ec-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.ec-desc{font-size:14px;font-weight:500;color:var(--text);flex:1;line-height:1.35}
+.ec-amount{font-size:16px;font-weight:700;color:var(--primary);white-space:nowrap}
+.ec-meta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px}
+.badge{font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px}
+.b-gray{background:var(--s3);color:var(--t2)}
+.b-green{background:var(--accent-bg);color:var(--accent)}
+.b-amber{background:var(--warn-bg);color:var(--warn)}
+.b-blue{background:var(--info-bg);color:var(--info)}
+.ec-prov{font-size:12px;color:var(--t3);margin-top:4px}
+.ec-actions{display:flex;justify-content:flex-end;margin-top:8px;padding-top:8px;border-top:.5px solid var(--border)}
+.empty-state{text-align:center;padding:48px 20px}
+.empty-icon{font-size:42px;margin-bottom:12px;opacity:.25}
+.empty-state p{font-size:14px;color:var(--t2)}
+.export-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.export-bar button{flex:1;min-width:90px;padding:10px 8px;font-size:12px;font-weight:500;border:.5px solid var(--border2);border-radius:var(--r);background:var(--surface);color:var(--t2);cursor:pointer}
+.export-bar button:active{background:var(--s3)}
+/* RUBROS PERSONALIZADOS */
+.custom-rubro-item{background:var(--surface);border-radius:var(--r);border:.5px solid var(--border);padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cri-info{flex:1}
+.cri-code{font-size:12px;font-weight:600;color:var(--info);margin-bottom:2px}
+.cri-desc{font-size:13px;color:var(--text);font-weight:500}
+.cri-meta{font-size:11px;color:var(--t3);margin-top:2px}
+.cri-actions{display:flex;gap:6px;flex-shrink:0}
+.divider{height:.5px;background:var(--border);margin:16px 0}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--rl) var(--rl) 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px}
+.modal-box h3{font-size:16px;font-weight:600;margin-bottom:8px}
+.modal-box p{font-size:14px;color:var(--t2);margin-bottom:18px;line-height:1.5}
+.modal-actions{display:flex;gap:10px}
+.modal-actions button{flex:1;padding:12px;font-size:15px;font-weight:600;border-radius:var(--r);border:none;cursor:pointer}
+.btn-cancel{background:var(--s3);color:var(--t2)}
+.btn-confirm-del{background:var(--danger);color:#fff}
+/* LEGEND */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+@media(prefers-color-scheme:dark){
+  :root{--surface:#1c1c1e;--s2:#141414;--s3:#2c2c2e;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#f5f5f7;--t2:#a1a1aa;--t3:#71717a;--accent-bg:#0d2b23;--warn-bg:#2a1e0a;--danger-bg:#2a0f0f;--info-bg:#0d1f35}
+  .app-header{background:#0d0d14}
+  .bar-fill{background:linear-gradient(90deg,#1d9e75,#5dcaa5)}
+  .bar-fill.custom{background:linear-gradient(90deg,#185fa5,#378add)}
+  .stat-card .s-val{color:var(--text)}
+  .pi-pct{color:#5dcaa5}
+  .gb-pct{color:#5dcaa5}
+  .b-green{background:#0d2b23;color:#5dcaa5}
+  .b-blue{background:#0d1f35;color:#85b7eb}
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>💧 Reservorio Central 12.000 m³</h1>
+  <p>AGUAPEN EP · LIP-CAF-AGP-2025-001 · Santa Elena</p>
+  <span class="presup-pill">Presupuesto referencial: $3,095,562.74</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('registro',this)"><span class="tab-icon">➕</span>Registrar</button>
+  <button class="tab" onclick="showTab('dashboard',this)"><span class="tab-icon">📊</span>Dashboard</button>
+  <button class="tab" onclick="showTab('historial',this)"><span class="tab-icon">📋</span>Historial</button>
+  <button class="tab" onclick="showTab('custom',this)"><span class="tab-icon">🏷️</span>Mis rubros</button>
+</div>
+
+<!-- ===== REGISTRO ===== -->
+<div id="pane-registro" class="pane active">
+  <div class="sec-title">Tipo de rubro</div>
+  <div class="card">
+    <div class="field">
+      <label>Categoría</label>
+      <select id="sel-categoria" onchange="onCatChange()">
+        <option value="presup">📄 Rubros del presupuesto referencial</option>
+        <option value="custom">🏷️ Mis rubros personalizados</option>
+      </select>
+    </div>
+    <div id="grupo-presup">
+      <div class="field">
+        <label>Rubro del presupuesto</label>
+        <select id="sel-rubro" onchange="onRubroChange()">
+          <option value="">— Elegir rubro —</option>
+        </select>
+      </div>
+      <div id="rubro-info" class="rubro-info">
+        <div class="ri-item"><span class="ri-lbl">Presupuestado</span><span class="ri-val" id="ri-presup">—</span></div>
+        <div class="ri-item"><span class="ri-lbl">Cantidad APU</span><span class="ri-val" id="ri-cant">—</span></div>
+        <div class="ri-item"><span class="ri-lbl">P.U. (APU)</span><span class="ri-val" id="ri-pu">—</span></div>
+      </div>
+    </div>
+    <div id="grupo-custom" style="display:none">
+      <div class="field">
+        <label>Rubro personalizado</label>
+        <select id="sel-custom-rubro">
+          <option value="">— Elegir rubro personalizado —</option>
+        </select>
+      </div>
+      <div id="custom-rubro-info" style="display:none;background:var(--info-bg);border:.5px solid rgba(24,95,165,.2);border-radius:var(--r);padding:10px 12px;margin-top:8px;font-size:12px;color:var(--info)"></div>
+    </div>
+  </div>
+
+  <div class="sec-title">Datos del gasto / compra</div>
+  <div class="card">
+    <div class="field">
+      <label>Descripción</label>
+      <textarea id="inp-desc" placeholder="Ej: Pago sueldo operadores semana 12 · 4 personas"></textarea>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Monto ($)</label>
+        <input type="number" id="inp-monto" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label>Fecha</label>
+        <input type="date" id="inp-fecha">
+      </div>
+    </div>
+    <div class="field">
+      <label>Tipo de registro</label>
+      <select id="sel-tipo">
+        <option value="compra">🛒 Compra / material</option>
+        <option value="mano_obra">👷 Mano de obra / sueldo</option>
+        <option value="transporte">🚛 Transporte / flete</option>
+        <option value="equipo">🚧 Alquiler de equipo</option>
+        <option value="subcontrato">📝 Subcontrato</option>
+        <option value="indirecto">💼 Gasto indirecto</option>
+        <option value="otro">• Otro</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="sec-title">Documento y proveedor</div>
+  <div class="card">
+    <div class="field">
+      <label>N° Factura / Documento</label>
+      <input type="text" id="inp-factura" placeholder="001-001-000000001">
+    </div>
+    <div class="field">
+      <label>RUC / Proveedor o beneficiario</label>
+      <input type="text" id="inp-proveedor" placeholder="Razón social, RUC o nombre">
+    </div>
+    <div class="field">
+      <label>Observaciones (opcional)</label>
+      <input type="text" id="inp-obs" placeholder="Notas adicionales">
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="guardarRegistro()">💾 Guardar registro</button>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="pane-dashboard" class="pane">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="s-lbl">Total registrado</div>
+      <div class="s-val" id="d-total">$0</div>
+      <div class="s-sub" id="d-pct">0% del presupuesto</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-lbl">Registros</div>
+      <div class="s-val" id="d-count">0</div>
+      <div class="s-sub" id="d-rubros">0 rubros</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-lbl">Gastos presup.</div>
+      <div class="s-val" id="d-total-presup">$0</div>
+      <div class="s-sub" id="d-sub-presup">rubros APU</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-lbl">Gastos adicionales</div>
+      <div class="s-val" id="d-total-custom">$0</div>
+      <div class="s-sub" id="d-sub-custom">rubros propios</div>
+    </div>
+  </div>
+
+  <div class="global-bar">
+    <div class="gb-top"><span class="gb-lbl">Avance vs. presupuesto referencial</span><span class="gb-pct" id="d-pct-bar">0.0%</span></div>
+    <div class="bar-track"><div class="bar-fill" id="d-bar" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px">
+      <span id="d-bar-gastado" style="font-size:11px;color:var(--t3)">Gastado: $0.00</span>
+      <span style="font-size:11px;color:var(--t3)">Presupuesto: $3,095,562.74</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Rubro APU</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--info)"></div>Rubro personalizado</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div>Sobrepresupuestado</div>
+  </div>
+
+  <div class="rubros-section">
+    <h3>Avance por rubro</h3>
+    <div id="prog-list"><div class="empty-state"><div class="empty-icon">📊</div><p>Sin registros aún</p></div></div>
+  </div>
+</div>
+
+<!-- ===== HISTORIAL ===== -->
+<div id="pane-historial" class="pane">
+  <div class="export-bar">
+    <button onclick="exportarCSV()">📥 CSV</button>
+    <button onclick="exportarJSON()">💾 Backup</button>
+    <button onclick="importarJSON()">🔄 Restaurar</button>
+  </div>
+  <div class="filter-bar">
+    <select id="fil-rubro" onchange="renderHistorial()">
+      <option value="">Todos los rubros</option>
+      <optgroup id="fil-presup-group" label="── Presupuesto APU ──"></optgroup>
+      <optgroup id="fil-custom-group" label="── Mis rubros ──"></optgroup>
+    </select>
+  </div>
+  <div class="filter-bar" style="margin-top:-4px">
+    <select id="fil-tipo" onchange="renderHistorial()">
+      <option value="">Todos los tipos</option>
+      <option value="compra">Compra/Material</option>
+      <option value="mano_obra">Mano de obra/Sueldo</option>
+      <option value="transporte">Transporte/Flete</option>
+      <option value="equipo">Equipo</option>
+      <option value="subcontrato">Subcontrato</option>
+      <option value="indirecto">Indirecto</option>
+      <option value="otro">Otro</option>
+    </select>
+    <select id="fil-cat" onchange="renderHistorial()">
+      <option value="">Todos</option>
+      <option value="presup">Solo APU</option>
+      <option value="custom">Solo personalizados</option>
+    </select>
+  </div>
+  <div id="hist-total-filtro" style="font-size:12px;color:var(--t2);margin-bottom:10px;text-align:right"></div>
+  <div id="hist-list"></div>
+  <input type="file" id="inp-import" accept=".json" style="display:none" onchange="procesarImport(event)">
+</div>
+
+<!-- ===== MIS RUBROS ===== -->
+<div id="pane-custom" class="pane">
+  <div class="sec-title">Crear rubro personalizado</div>
+  <div class="card">
+    <div class="row2">
+      <div class="field">
+        <label>Código interno</label>
+        <input type="text" id="cr-codigo" placeholder="Ej: TRANSP" maxlength="12" style="text-transform:uppercase">
+      </div>
+      <div class="field">
+        <label>Unidad</label>
+        <input type="text" id="cr-unidad" placeholder="Ej: glb, mes, u" maxlength="10">
+      </div>
+    </div>
+    <div class="field">
+      <label>Nombre / descripción</label>
+      <input type="text" id="cr-desc" placeholder="Ej: Transporte de materiales al sitio">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Categoría</label>
+        <select id="cr-cat">
+          <option value="transporte">🚛 Transporte</option>
+          <option value="mano_obra">👷 Mano de obra</option>
+          <option value="administracion">🏢 Administración</option>
+          <option value="seguridad">🦺 Seguridad / HSE</option>
+          <option value="ambiental">🌿 Ambiental</option>
+          <option value="herramienta">🔧 Herramienta menor</option>
+          <option value="combustible">⛽ Combustible</option>
+          <option value="otro">• Otro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Presupuesto asignado ($)</label>
+        <input type="number" id="cr-presup" placeholder="0.00 (opcional)" min="0" step="0.01" inputmode="decimal">
+      </div>
+    </div>
+    <button class="btn-primary" id="btn-crear-rubro" onclick="crearRubroCustom()">➕ Crear rubro</button>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sec-title">Rubros personalizados creados</div>
+  <div id="custom-rubros-list">
+    <div class="empty-state"><div class="empty-icon">🏷️</div><p>No has creado rubros personalizados aún</p></div>
+  </div>
+</div>
+
+<!-- MODAL ELIMINAR -->
+<div class="modal-overlay" id="modal-del">
+  <div class="modal-box">
+    <h3>⚠️ Eliminar</h3>
+    <p id="modal-del-msg">¿Confirmar eliminación?</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal('modal-del')">Cancelar</button>
+      <button class="btn-confirm-del" onclick="confirmarEliminar()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR RUBRO CUSTOM -->
+<div class="modal-overlay" id="modal-edit-rubro">
+  <div class="modal-box">
+    <h3>✏️ Editar rubro</h3>
+    <div class="field" style="margin-bottom:10px">
+      <label>Nombre</label>
+      <input type="text" id="edit-rubro-desc">
+    </div>
+    <div class="row2" style="margin-bottom:10px">
+      <div class="field">
+        <label>Código</label>
+        <input type="text" id="edit-rubro-codigo" maxlength="12" style="text-transform:uppercase">
+      </div>
+      <div class="field">
+        <label>Unidad</label>
+        <input type="text" id="edit-rubro-unidad" maxlength="10">
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Presupuesto asignado ($)</label>
+      <input type="number" id="edit-rubro-presup" min="0" step="0.01" inputmode="decimal">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModal('modal-edit-rubro')">Cancelar</button>
+      <button style="flex:1;padding:12px;font-size:15px;font-weight:600;border-radius:var(--r);border:none;cursor:pointer;background:var(--accent);color:#fff" onclick="confirmarEditRubro()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const PRESUP_TOTAL=3095562.74,SK='reservorio_gastos_v2',SKR='reservorio_rubros_custom';
+let registros=[],customRubros=[],pendingDelId=null,pendingDelType=null,editingRubroId=null;
+
+const RUBROS_APU=[
+  {c:"40001",d:"Desbroce y limpieza",u:"m2",q:4610.76,pu:0.46,t:2120.95},
+  {c:"40002",d:"Trazado y Replanteo de Estructuras",u:"m2",q:3643.75,pu:0.94,t:3425.13},
+  {c:"40006",d:"Excavación a máquina en suelo",u:"m3",q:14426.79,pu:2.70,t:38952.33},
+  {c:"40007",d:"Excavación a máquina en roca",u:"m3",q:5953.55,pu:16.41,t:97697.76},
+  {c:"40008",d:"Excavación en roca con explosivos",u:"m3",q:288.54,pu:21.71,t:6264.11},
+  {c:"40012",d:"Desalojo de material hasta 5 km",u:"m3-km",q:93764.63,pu:0.24,t:22503.51},
+  {c:"40015",d:"Relleno con grava medio",u:"m3",q:867.75,pu:12.09,t:10491.10},
+  {c:"40016",d:"Relleno compactado material del lugar",u:"m3",q:1915.95,pu:4.96,t:9503.11},
+  {c:"40017",d:"Relleno cascajo importado compactado",u:"m3",q:5933.87,pu:12.88,t:76428.25},
+  {c:"40018",d:"Relleno para cimentación y drenaje",u:"m3",q:473.60,pu:12.69,t:6009.98},
+  {c:"30053",d:"Geomalla triaxial Tx160",u:"m2",q:3471.00,pu:7.48,t:25963.08},
+  {c:"40019",d:"Suelo cemento",u:"m3",q:520.65,pu:32.26,t:16796.17},
+  {c:"30002",d:"Hormigón simple f'c=140 kg/cm² (limpieza)",u:"m3",q:123.86,pu:155.26,t:19230.50},
+  {c:"30007",d:"Hormigón poroso simple f'c=280 kg/cm²",u:"m3",q:844.23,pu:234.02,t:197566.70},
+  {c:"30022",d:"Acero de refuerzo Fy=4200 kg/cm²",u:"Kg",q:256678.17,pu:2.11,t:541590.94},
+  {c:"30008",d:"Hormigón f'c=350 kg/cm² con inhibidor y microsílice (incl. encofrado)",u:"m3",q:2721.79,pu:356.70,t:970862.49},
+  {c:"30039",d:"Enlucido con mortero",u:"m2",q:1084.56,pu:9.25,t:10032.18},
+  {c:"30061",d:"Impermeabilizante acrílico para cubiertas",u:"m2",q:3210.86,pu:9.91,t:31819.62},
+  {c:"30062",d:"Sellador plástico asfáltico para juntas",u:"m",q:365.20,pu:13.33,t:4868.12},
+  {c:"30063",d:"Protección e impermeabilización de superficies",u:"m2",q:5773.98,pu:10.16,t:58663.64},
+  {c:"30064",d:"Aditivo adhesivo epóxico para ligar hormigón",u:"Kg",q:796.50,pu:38.53,t:30689.15},
+  {c:"30065",d:"Curador para hormigón",u:"m2",q:6318.30,pu:1.76,t:11120.21},
+  {c:"30066",d:"Aditivo para sellado de juntas",u:"Kg",q:365.20,pu:21.20,t:7742.24},
+  {c:"30067",d:"Recubrimiento Belzona 5811 interior",u:"m2",q:121.58,pu:58.36,t:7095.41},
+  {c:"31001",d:"Perfil hidroexpansivo (Junta hidrotite)",u:"m",q:8.00,pu:300.77,t:2406.16},
+  {c:"31002",d:"Junta de dilatación Gumba FV1870",u:"m2",q:201.45,pu:108.14,t:21784.80},
+  {c:"31003",d:"Junta Elástica Expansiva Jeene JJ644R",u:"m",q:201.45,pu:281.32,t:56671.91},
+  {c:"31006",d:"Cinta PVC 0-22 cm para juntas",u:"m",q:850.37,pu:23.30,t:19813.62},
+  {c:"31005",d:"Cinta PVC 0-20 cm para juntas",u:"m",q:850.37,pu:19.75,t:16794.81},
+  {c:"31004",d:"Cinta PVC 0-15 cm para juntas",u:"m",q:850.37,pu:13.91,t:11828.65},
+  {c:"30046",d:"Mortero sello de placas y tapas",u:"m",q:654.00,pu:1.23,t:804.42},
+  {c:"30045",d:"Mortero de regularización de losa inferior",u:"m2",q:3124.80,pu:11.89,t:37153.87},
+  {c:"30032",d:"Manhole (tapa hierro dúctil) DN=600 mm",u:"u",q:16,pu:437.21,t:6995.36},
+  {c:"30047",d:"Acabado gravilla e=0.10 m",u:"m2",q:3237.60,pu:3.82,t:12367.63},
+  {c:"31008",d:"Placa de reducción DN 900×700",u:"u",q:4,pu:770.29,t:3081.16},
+  {c:"31009",d:"Placa de soporte 300×300×10 mm con pernos",u:"u",q:16,pu:70.64,t:1130.24},
+  {c:"30035",d:"Acero estructural ASTM A36",u:"kg",q:14699.54,pu:3.94,t:57916.19},
+  {c:"40021",d:"Camino de acceso (ancho 6 m)",u:"m",q:300.00,pu:26.28,t:7884.00},
+  {c:"40022",d:"Cunetas de caminos",u:"m",q:273.88,pu:22.93,t:6280.07},
+  {c:"40044",d:"Cerramiento perimetral malla galvanizada",u:"m",q:359.54,pu:114.47,t:41156.54},
+  {c:"30070",d:"Puerta de ingreso con malla galvanizada",u:"m2",q:10.00,pu:120.84,t:1208.40},
+  {c:"10013",d:"Válvula de altitud DN 900 mm (Ross) con switch",u:"u",q:1,pu:81811.67,t:81811.67},
+  {c:"10025",d:"Válvula mariposa Wafer DN 500 mm PN10 manual",u:"u",q:2,pu:9713.84,t:19427.67},
+  {c:"10030",d:"Válvula mariposa DN 600 mm PN10 manual",u:"u",q:4,pu:7469.14,t:29876.56},
+  {c:"10034",d:"Válvula mariposa DN 900 mm PN10 eléctrica",u:"u",q:1,pu:29705.89,t:29705.89},
+  {c:"10065",d:"Brida ciega DN 500 mm PN10",u:"u",q:1,pu:968.08,t:968.08},
+  {c:"10079",d:"Reducción excéntrica DN 700×600 mm PN10",u:"u",q:4,pu:2065.51,t:8262.04},
+  {c:"10089",d:"Unión flexible DN 500 mm (Dresser Style 38)",u:"u",q:2,pu:877.53,t:1755.06},
+  {c:"10090",d:"Unión flexible DN 600 mm (Dresser Style 38)",u:"u",q:6,pu:935.40,t:5612.40},
+  {c:"10103",d:"Junta desmontaje DN 900 mm PN10 trabada",u:"u",q:1,pu:3839.94,t:3839.94},
+  {c:"10252",d:"Tubo liso × brida Ø900 L=77.00 m",u:"U",q:77,pu:1099.31,t:84646.87},
+  {c:"80028",d:"Transmisor nivel radar Siemens SITRANS",u:"u",q:2,pu:2520.00,t:5040.00},
+  {c:"80029",d:"Transmisor presión 0-100 PSI (4-20mA)",u:"u",q:2,pu:1236.04,t:2472.08},
+  {c:"80030",d:"Cableado señales control y acometidas",u:"u",q:1,pu:6135.79,t:6135.79},
+  {c:"80031",d:"Iluminación cuarto de válvulas",u:"u",q:2,pu:592.05,t:1184.10},
+  {c:"80032",d:"Tablero control y registro de niveles",u:"u",q:1,pu:14654.93,t:14654.93},
+  {c:"80033",d:"Iluminación exterior fotovoltaica",u:"u",q:1,pu:6938.70,t:6938.70},
+  {c:"80034",d:"Transformador 15 kVA monofásico 220-110V",u:"u",q:1,pu:3628.41,t:3628.41},
+  {c:"80035",d:"Acometida principal monofásica 6AWG",u:"u",q:1,pu:2392.95,t:2392.95},
+  {c:"80036",d:"Sistema puesta a tierra equipos (x2)",u:"u",q:2,pu:851.49,t:1702.98},
+  {c:"80037",d:"Caudalímetro ultrasónico DN15-6000 mm",u:"u",q:2,pu:19038.33,t:38076.66},
+  {c:"SC-001",d:"Alquiler Batería Sanitaria Portátil",u:"u-mes",q:9,pu:300.00,t:2700.00},
+  {c:"SC-002",d:"Agua para control de polvo",u:"m3",q:200,pu:3.74,t:748.00},
+  {c:"SC-003",d:"Análisis calidad agua NTE INEN 1108:2020",u:"u",q:2,pu:509.44,t:1018.88},
+  {c:"SC-004",d:"Letreros informativos y preventivos",u:"u",q:10,pu:15.08,t:150.80},
+  {c:"SC-005",d:"Rótulos ambientales RTE INEN 004-1:2011",u:"u",q:2,pu:130.45,t:260.90},
+  {c:"SC-006",d:"Monitoreo calidad del aire (PM10/PM2.5)",u:"u",q:3,pu:483.00,t:1449.00}
+];
+
+const RUBROS_DEFAULT_CUSTOM=[
+  {id:'CR-001',c:'TRANSP',d:'Transporte de materiales al sitio',u:'glb',cat:'transporte',presup:0},
+  {id:'CR-002',c:'SUELD',d:'Pago de sueldos y salarios',u:'mes',cat:'mano_obra',presup:0},
+  {id:'CR-003',c:'VIAT',d:'Viáticos y movilización personal',u:'glb',cat:'administracion',presup:0},
+  {id:'CR-004',d:'Combustible maquinaria y vehículos',c:'COMB',u:'gal',cat:'combustible',presup:0},
+  {id:'CR-005',c:'HSE',d:'Seguridad industrial y EPP',u:'glb',cat:'seguridad',presup:0},
+  {id:'CR-006',c:'ADMN',d:'Gastos administrativos de obra',u:'mes',cat:'administracion',presup:0}
+];
+
+function cargar(){
+  try{const d=localStorage.getItem(SK);if(d)registros=JSON.parse(d)}catch(e){}
+  try{const d=localStorage.getItem(SKR);if(d)customRubros=JSON.parse(d);else{customRubros=RUBROS_DEFAULT_CUSTOM.map(r=>({...r}));guardarRubros()}}catch(e){customRubros=RUBROS_DEFAULT_CUSTOM.map(r=>({...r}));guardarRubros()}
+}
+function guardar(){try{localStorage.setItem(SK,JSON.stringify(registros))}catch(e){}}
+function guardarRubros(){try{localStorage.setItem(SKR,JSON.stringify(customRubros))}catch(e){}}
+
+function init(){
+  cargar();
+  document.getElementById('inp-fecha').value=new Date().toISOString().slice(0,10);
+  buildSelects();
+  renderCustomRubros();
+  renderDashboard();
+  renderHistorial();
+}
+
+function buildSelects(){
+  const sR=document.getElementById('sel-rubro');
+  const fG=document.getElementById('fil-presup-group');
+  RUBROS_APU.forEach(r=>{
+    const o=document.createElement('option');o.value=r.c;o.textContent='['+r.c+'] '+r.d;
+    sR.appendChild(o);fG.appendChild(o.cloneNode(true));
+  });
+  rebuildCustomSelects();
+}
+
+function rebuildCustomSelects(){
+  const sC=document.getElementById('sel-custom-rubro');
+  const fCG=document.getElementById('fil-custom-group');
+  sC.innerHTML='<option value="">— Elegir rubro personalizado —</option>';
+  fCG.innerHTML='';
+  customRubros.forEach(r=>{
+    const o=document.createElement('option');o.value=r.id;o.textContent='['+r.c+'] '+r.d;
+    sC.appendChild(o);fCG.appendChild(o.cloneNode(true));
+  });
+}
+
+function fm(n){return'$'+Number(n).toLocaleString('es-EC',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmS(n){if(n>=1000000)return'$'+(n/1000000).toFixed(2)+'M';if(n>=1000)return'$'+(n/1000).toFixed(1)+'k';return fm(n)}
+function fn(n,d=2){return Number(n).toLocaleString('es-EC',{minimumFractionDigits:d,maximumFractionDigits:d})}
+
+function onCatChange(){
+  const v=document.getElementById('sel-categoria').value;
+  document.getElementById('grupo-presup').style.display=v==='presup'?'block':'none';
+  document.getElementById('grupo-custom').style.display=v==='custom'?'block':'none';
+}
+
+function onRubroChange(){
+  const cod=document.getElementById('sel-rubro').value;
+  const info=document.getElementById('rubro-info');
+  if(!cod){info.classList.remove('show');return}
+  const r=RUBROS_APU.find(x=>x.c===cod);if(!r)return;
+  document.getElementById('ri-presup').textContent=fm(r.t);
+  document.getElementById('ri-cant').textContent=fn(r.q,2)+' '+r.u;
+  document.getElementById('ri-pu').textContent=fm(r.pu)+'/'+r.u;
+  info.classList.add('show');
+}
+
+document.getElementById('sel-custom-rubro').addEventListener('change',function(){
+  const id=this.value;
+  const info=document.getElementById('custom-rubro-info');
+  if(!id){info.style.display='none';return}
+  const r=customRubros.find(x=>x.id===id);if(!r)return;
+  info.style.display='block';
+  const gastado=registros.filter(x=>x.customId===id).reduce((s,x)=>s+x.monto,0);
+  info.textContent='Categoría: '+r.cat+' · Unidad: '+r.u+(r.presup>0?' · Presup: '+fm(r.presup)+' · Gastado: '+fm(gastado):'');
+});
+
+function guardarRegistro(){
+  const cat=document.getElementById('sel-categoria').value;
+  const desc=document.getElementById('inp-desc').value.trim();
+  const monto=parseFloat(document.getElementById('inp-monto').value);
+  const fecha=document.getElementById('inp-fecha').value;
+  const tipo=document.getElementById('sel-tipo').value;
+  const factura=document.getElementById('inp-factura').value.trim();
+  const proveedor=document.getElementById('inp-proveedor').value.trim();
+  const obs=document.getElementById('inp-obs').value.trim();
+
+  if(!desc){toast('Ingresa una descripción','err');return}
+  if(isNaN(monto)||monto<=0){toast('Ingresa un monto válido mayor a $0','err');return}
+  if(!fecha){toast('Selecciona la fecha','err');return}
+
+  let reg={id:Date.now(),cat,desc,monto,fecha,tipo,factura,proveedor,obs};
+
+  if(cat==='presup'){
+    const cod=document.getElementById('sel-rubro').value;
+    if(!cod){toast('Selecciona un rubro del presupuesto','err');return}
+    const r=RUBROS_APU.find(x=>x.c===cod);
+    reg.cod=cod;reg.rd=r?r.d:'';reg.rt=r?r.t:0;
+  } else {
+    const id=document.getElementById('sel-custom-rubro').value;
+    if(!id){toast('Selecciona un rubro personalizado','err');return}
+    const r=customRubros.find(x=>x.id===id);
+    reg.customId=id;reg.cod=r?r.c:'CUSTOM';reg.rd=r?r.d:'';reg.rt=r?r.presup:0;
+  }
+
+  registros.unshift(reg);guardar();
+  ['inp-desc','inp-monto','inp-factura','inp-proveedor','inp-obs'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sel-rubro').value='';
+  document.getElementById('sel-custom-rubro').value='';
+  document.getElementById('rubro-info').classList.remove('show');
+  document.getElementById('custom-rubro-info').style.display='none';
+  document.getElementById('inp-fecha').value=new Date().toISOString().slice(0,10);
+  toast('✓ Registro guardado','ok');
+  renderDashboard();renderHistorial();
+}
+
+function renderDashboard(){
+  const total=registros.reduce((s,r)=>s+r.monto,0);
+  const totalPresup=registros.filter(r=>r.cat==='presup').reduce((s,r)=>s+r.monto,0);
+  const totalCustom=registros.filter(r=>r.cat==='custom').reduce((s,r)=>s+r.monto,0);
+  const pct=total/PRESUP_TOTAL*100;
+  const rubrosSet=new Set(registros.map(r=>r.cat==='custom'?r.customId:r.cod));
+
+  document.getElementById('d-total').textContent=fmS(total);
+  document.getElementById('d-pct').textContent=pct.toFixed(2)+'% del presupuesto';
+  document.getElementById('d-count').textContent=registros.length;
+  document.getElementById('d-rubros').textContent=rubrosSet.size+' rubros';
+  document.getElementById('d-total-presup').textContent=fmS(totalPresup);
+  document.getElementById('d-sub-presup').textContent=new Set(registros.filter(r=>r.cat==='presup').map(r=>r.cod)).size+' rubros APU';
+  document.getElementById('d-total-custom').textContent=fmS(totalCustom);
+  document.getElementById('d-sub-custom').textContent=new Set(registros.filter(r=>r.cat==='custom').map(r=>r.customId)).size+' rubros propios';
+  document.getElementById('d-pct-bar').textContent=pct.toFixed(1)+'%';
+  document.getElementById('d-bar-gastado').textContent='Gastado: '+fm(total);
+  const bar=document.getElementById('d-bar');
+  bar.style.width=Math.min(pct,100)+'%';
+  bar.className='bar-fill'+(pct>=100?' over':'');
+
+  const byKey={};
+  registros.forEach(r=>{
+    const key=r.cat==='custom'?'C|'+r.customId:'P|'+r.cod;
+    if(!byKey[key])byKey[key]={d:r.rd,presup:r.rt,gastado:0,isCustom:r.cat==='custom'};
+    byKey[key].gastado+=r.monto;
+  });
+  const sorted=Object.entries(byKey).sort((a,b)=>b[1].gastado-a[1].gastado);
+  let html='';
+  if(!sorted.length){html='<div class="empty-state"><div class="empty-icon">📊</div><p>Sin registros aún</p></div>';}
+  else sorted.forEach(([key,d])=>{
+    const cod=key.split('|')[1];
+    const pR=d.presup>0?(d.gastado/d.presup*100):0;
+    const pD=Math.min(pR,100);
+    const over=d.presup>0&&pR>=100;
+    const cls=d.isCustom?'custom':(over?'over':'');
+    const pctTxt=d.presup>0?pR.toFixed(0)+'%':'—';
+    html+=`<div class="prog-item">
+      <div class="pi-top">
+        <span class="pi-name">[${cod}] ${d.d}${d.isCustom?'<span class="custom-badge">PROPIO</span>':''}</span>
+        <span class="pi-pct ${cls}">${pctTxt}</span>
+      </div>
+      <div class="pi-amounts"><span>${fm(d.gastado)} gastado</span><span>${d.presup>0?'Presup.: '+fm(d.presup):'Sin presup. asignado'}</span></div>
+      ${d.presup>0?`<div class="pi-bar"><div class="pi-fill ${cls}" style="width:${pD}%"></div></div>`:''}
+    </div>`;
+  });
+  document.getElementById('prog-list').innerHTML=html;
+}
+
+function renderHistorial(){
+  const filR=document.getElementById('fil-rubro').value;
+  const filT=document.getElementById('fil-tipo').value;
+  const filC=document.getElementById('fil-cat').value;
+  let datos=registros;
+  if(filR)datos=datos.filter(r=>r.cat==='presup'?r.cod===filR:r.customId===filR);
+  if(filT)datos=datos.filter(r=>r.tipo===filT);
+  if(filC)datos=datos.filter(r=>r.cat===filC);
+  const tot=datos.reduce((s,r)=>s+r.monto,0);
+  document.getElementById('hist-total-filtro').textContent=datos.length>0?datos.length+' registro(s) · Total: '+fm(tot):'';
+  const tipoIcon={compra:'🛒',mano_obra:'👷',transporte:'🚛',equipo:'🚧',subcontrato:'📝',indirecto:'💼',otro:'•'};
+  const cont=document.getElementById('hist-list');
+  if(!datos.length){cont.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>Sin registros'+(filR||filT||filC?' para este filtro':'')+'</p></div>';return}
+  let html='';
+  datos.forEach(r=>{
+    const fD=r.fecha?new Date(r.fecha+'T12:00:00').toLocaleDateString('es-EC',{day:'2-digit',month:'short',year:'numeric'}):'';
+    const isC=r.cat==='custom';
+    html+=`<div class="entry-card${isC?' custom-entry':''}">
+      <div class="ec-top">
+        <span class="ec-desc">${r.desc}</span>
+        <span class="ec-amount">${fm(r.monto)}</span>
+      </div>
+      <div class="ec-meta">
+        <span class="badge ${isC?'b-blue':'b-gray'}">${r.cod}</span>
+        ${isC?'<span class="badge b-blue">PROPIO</span>':''}
+        <span class="badge b-green">${tipoIcon[r.tipo]||'•'} ${r.tipo.replace('_',' ')}</span>
+        ${r.factura?`<span class="badge b-amber">${r.factura}</span>`:''}
+        <span class="badge b-gray">📅 ${fD}</span>
+      </div>
+      ${r.proveedor?`<div class="ec-prov">🏢 ${r.proveedor}</div>`:''}
+      ${r.obs?`<div class="ec-prov" style="margin-top:2px">💬 ${r.obs}</div>`:''}
+      <div class="ec-actions"><button class="btn-danger-sm" onclick="pedirEliminar(${r.id},'reg')">Eliminar</button></div>
+    </div>`;
+  });
+  cont.innerHTML=html;
+}
+
+function renderCustomRubros(){
+  rebuildCustomSelects();
+  const cont=document.getElementById('custom-rubros-list');
+  if(!customRubros.length){cont.innerHTML='<div class="empty-state"><div class="empty-icon">🏷️</div><p>No has creado rubros aún</p></div>';return}
+  const catIcon={transporte:'🚛',mano_obra:'👷',administracion:'🏢',seguridad:'🦺',ambiental:'🌿',herramienta:'🔧',combustible:'⛽',otro:'•'};
+  let html='';
+  customRubros.forEach(r=>{
+    const gastado=registros.filter(x=>x.customId===r.id).reduce((s,x)=>s+x.monto,0);
+    html+=`<div class="custom-rubro-item">
+      <div class="cri-info">
+        <div class="cri-code">${catIcon[r.cat]||'•'} [${r.c}] · ${r.u}</div>
+        <div class="cri-desc">${r.d}</div>
+        <div class="cri-meta">${r.presup>0?'Presup: '+fm(r.presup)+' · ':''} Gastado: ${fm(gastado)}</div>
+      </div>
+      <div class="cri-actions">
+        <button class="btn-edit-sm" onclick="pedirEditarRubro('${r.id}')">Editar</button>
+        <button class="btn-danger-sm" onclick="pedirEliminar('${r.id}','rubro')">✕</button>
+      </div>
+    </div>`;
+  });
+  cont.innerHTML=html;
+}
+
+function crearRubroCustom(){
+  const cod=document.getElementById('cr-codigo').value.trim().toUpperCase();
+  const desc=document.getElementById('cr-desc').value.trim();
+  const unidad=document.getElementById('cr-unidad').value.trim();
+  const cat=document.getElementById('cr-cat').value;
+  const presup=parseFloat(document.getElementById('cr-presup').value)||0;
+  if(!cod){toast('Ingresa un código interno','err');return}
+  if(!desc){toast('Ingresa el nombre del rubro','err');return}
+  if(!unidad){toast('Ingresa la unidad de medida','err');return}
+  if(customRubros.find(r=>r.c===cod)){toast('El código '+cod+' ya existe','err');return}
+  const nuevo={id:'CR-'+Date.now(),c:cod,d:desc,u:unidad,cat,presup};
+  customRubros.push(nuevo);guardarRubros();
+  ['cr-codigo','cr-desc','cr-unidad','cr-presup'].forEach(id=>document.getElementById(id).value='');
+  toast('✓ Rubro "'+cod+'" creado','ok');
+  renderCustomRubros();
+}
+
+function pedirEditarRubro(id){
+  const r=customRubros.find(x=>x.id===id);if(!r)return;
+  editingRubroId=id;
+  document.getElementById('edit-rubro-desc').value=r.d;
+  document.getElementById('edit-rubro-codigo').value=r.c;
+  document.getElementById('edit-rubro-unidad').value=r.u;
+  document.getElementById('edit-rubro-presup').value=r.presup||'';
+  document.getElementById('modal-edit-rubro').classList.add('show');
+}
+
+function confirmarEditRubro(){
+  const r=customRubros.find(x=>x.id===editingRubroId);if(!r)return;
+  const newCod=document.getElementById('edit-rubro-codigo').value.trim().toUpperCase();
+  if(!newCod){toast('El código no puede estar vacío','err');return}
+  if(customRubros.find(x=>x.c===newCod&&x.id!==editingRubroId)){toast('El código '+newCod+' ya existe','err');return}
+  r.d=document.getElementById('edit-rubro-desc').value.trim()||r.d;
+  r.c=newCod;
+  r.u=document.getElementById('edit-rubro-unidad').value.trim()||r.u;
+  r.presup=parseFloat(document.getElementById('edit-rubro-presup').value)||0;
+  guardarRubros();cerrarModal('modal-edit-rubro');
+  toast('✓ Rubro actualizado','ok');
+  renderCustomRubros();renderDashboard();renderHistorial();
+}
+
+function pedirEliminar(id,type){
+  pendingDelId=id;pendingDelType=type;
+  let msg='';
+  if(type==='reg'){
+    const r=registros.find(x=>x.id===id);
+    msg=r?'¿Eliminar el registro "'+r.desc.substring(0,50)+(r.desc.length>50?'…':'')+'" por '+fm(r.monto)+'?':'¿Eliminar este registro?';
+  } else {
+    const r=customRubros.find(x=>x.id===id);
+    const cnt=registros.filter(x=>x.customId===id).length;
+    msg=r?'¿Eliminar el rubro "['+r.c+'] '+r.d+'"?'+(cnt>0?' Tiene '+cnt+' registro(s) asociado(s) que quedarán sin rubro.':''):'¿Eliminar este rubro?';
+  }
+  document.getElementById('modal-del-msg').textContent=msg;
+  document.getElementById('modal-del').classList.add('show');
+}
+
+function cerrarModal(id){document.getElementById(id||'modal-del').classList.remove('show');pendingDelId=null;pendingDelType=null;editingRubroId=null}
+
+function confirmarEliminar(){
+  if(pendingDelType==='reg'){
+    registros=registros.filter(r=>r.id!==pendingDelId);guardar();
+    toast('Registro eliminado','ok');renderDashboard();renderHistorial();
+  } else {
+    customRubros=customRubros.filter(r=>r.id!==pendingDelId);guardarRubros();
+    toast('Rubro eliminado','ok');renderCustomRubros();renderDashboard();renderHistorial();
+  }
+  cerrarModal('modal-del');
+}
+
+function exportarCSV(){
+  if(!registros.length){toast('Sin registros para exportar','err');return}
+  const header='ID,Categoría,Código,Rubro,Descripción,Monto ($),Fecha,Tipo,Factura,Proveedor,Observaciones,Presup.Rubro ($)\n';
+  const rows=registros.map(r=>[r.id,r.cat==='custom'?'PERSONALIZADO':'APU',r.cod,'"'+r.rd+'"','"'+r.desc+'"',r.monto.toFixed(2),r.fecha,r.tipo.replace('_',' '),'"'+(r.factura||'')+'"','"'+(r.proveedor||'')+'"','"'+(r.obs||'')+'"',r.rt].join(',')).join('\n');
+  descargar(new Blob(['\uFEFF'+header+rows],{type:'text/csv;charset=utf-8'}),'gastos_reservorio_'+new Date().toISOString().slice(0,10)+'.csv');
+  toast('CSV exportado','ok');
+}
+
+function exportarJSON(){
+  if(!registros.length&&!customRubros.length){toast('Sin datos para exportar','err');return}
+  const blob=new Blob([JSON.stringify({version:2,fecha:new Date().toISOString(),proyecto:'LIP-CAF-AGP-2025-001',registros,customRubros},null,2)],{type:'application/json'});
+  descargar(blob,'backup_reservorio_'+new Date().toISOString().slice(0,10)+'.json');
+  toast('Backup exportado','ok');
+}
+
+function descargar(blob,nombre){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nombre;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+function importarJSON(){document.getElementById('inp-import').click()}
+function procesarImport(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.registros&&!data.customRubros){toast('Archivo inválido','err');return}
+      if(confirm('Se restaurarán '+(data.registros||[]).length+' registros y '+(data.customRubros||[]).length+' rubros del backup. ¿Los datos actuales serán reemplazados. Continuar?')){
+        if(data.registros)registros=data.registros;
+        if(data.customRubros)customRubros=data.customRubros;
+        guardar();guardarRubros();
+        toast('✓ Datos restaurados','ok');
+        rebuildCustomSelects();renderCustomRubros();renderDashboard();renderHistorial();
+      }
+    }catch(err){toast('Error al leer el archivo','err')}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+function showTab(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='dashboard')renderDashboard();
+  if(id==='historial')renderHistorial();
+  if(id==='custom')renderCustomRubros();
+}
+
+let toastTimer;
+function toast(msg,type){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.className='toast show '+(type||'ok');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+['modal-del','modal-edit-rubro'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)cerrarModal(id)});
+});
+
+init();
+</script>
+</body>
+</html>
